@@ -16,7 +16,46 @@
             display: flex;
             height: 100vh;
             color: #333;
+            overflow: hidden; /* Mencegah scroll saat animasi */
         }
+
+        /* --- CSS SPLASH SCREEN DARMAJAYA CSC --- */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #111;
+            color: #00ffcc;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 1s ease-out, visibility 1s ease-out;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        #splash-screen h1 {
+            font-size: 2.5em;
+            margin: 0;
+            text-align: center;
+            animation: pulse 1.5s infinite;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+        }
+        #splash-screen p {
+            color: #aaa;
+            margin-top: 10px;
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; text-shadow: 0 0 20px rgba(0, 255, 204, 0.8); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        /* --------------------------------------- */
+
         .panel {
             flex: 1;
             padding: 20px;
@@ -110,6 +149,11 @@
 </head>
 <body>
 
+    <div id="splash-screen">
+        <h1>Darmajaya Cyber Security Club</h1>
+        <p>INITIALIZING WORKSPACE...</p>
+    </div>
+
     <div class="panel left-panel">
         <h2>🛠️ Builder Data</h2>
         <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Masukkan data diri untuk generate portfolio.</p>
@@ -155,6 +199,16 @@
     </div>
 
     <script>
+        // --- LOGIKA SPLASH SCREEN ---
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const splash = document.getElementById('splash-screen');
+                splash.style.opacity = '0';
+                splash.style.visibility = 'hidden';
+                document.body.style.overflow = 'auto'; // Kembalikan scroll setelah animasi
+            }, 2500); // Durasi tampil animasi (2.5 detik)
+        });
+
         // Set default value saat halaman pertama kali diload
         document.getElementById('inputName').value = "John Doe";
         document.getElementById('inputRole').value = "Web Developer & Security Enthusiast";
@@ -183,7 +237,7 @@
                 certsHTML = "\n                    <li>Belum ada sertifikat ditambahkan</li>";
             }
 
-            // 3. Susun Template HTML & CSS
+            // 3. Susun Template HTML, CSS, dan JS
             const htmlTemplate = `<!DOCTYPE html>
 <html lang="id">
 <head>
@@ -224,6 +278,11 @@
             border: 4px solid #f4f7f6;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             margin-bottom: 15px;
+            transition: transform 0.3s;
+        }
+        
+        .profile-img:hover {
+            transform: scale(1.05);
         }
 
         h1 { margin: 0; font-size: 26px; color: #222; }
@@ -262,13 +321,33 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             font-size: 14px;
         }
+
+        /* Desain Tombol JS */
+        .btn-action {
+            margin-top: 25px;
+            padding: 12px 25px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            transition: background 0.3s, transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0,123,255,0.2);
+        }
+        
+        .btn-action:hover { 
+            background-color: #0056b3; 
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
 
     <div class="card">
         <img src="${image}" alt="Foto Profil" class="profile-img">
-        <h1>${name}</h1>
+        <h1 id="userName">${name}</h1>
         <h3>${role}</h3>
         <p>${about}</p>
 
@@ -277,8 +356,27 @@
             <ul>${certsHTML}
             </ul>
         </div>
+        
+        <button id="contactBtn" class="btn-action">Say Hello!</button>
     </div>
 
+    <script>
+        // 1. Interaksi Klik Tombol
+        const btn = document.getElementById('contactBtn');
+        btn.addEventListener('click', function() {
+            alert('Akses Diterima! \\nTerima kasih sudah melihat portfolio ${name}. \\nMari terkoneksi dan berdiskusi seputar Cybersecurity dan Web Development!');
+        });
+
+        // 2. Interaksi Hover Profil Picture
+        const img = document.querySelector('.profile-img');
+        img.addEventListener('dblclick', function() {
+            alert('Status Sistem: Aman. Tidak ada kerentanan terdeteksi pada profil ini.');
+        });
+
+        // 3. Efek Hacker di Console Log (Coba tekan F12 / Inspect Element)
+        console.log('%c[+] System Secured.', 'color: #00ffcc; background: #000; font-size: 14px; padding: 2px 5px;');
+        console.log('%c[+] Portfolio loaded successfully for ${name}.', 'color: #00ffcc; background: #000; font-size: 14px; padding: 2px 5px;');
+    <\/script>
 </body>
 </html>`;
 
