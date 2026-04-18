@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Builder Generator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            display: flex;
+            height: 100vh;
+            color: #333;
+        }
+        .panel {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .left-panel {
+            background-color: #ffffff;
+            border-right: 1px solid #ddd;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            max-width: 400px;
+        }
+        .right-panel {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+        }
+        h2 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .right-panel h2 {
+            color: #fff;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        input[type="text"], input[type="url"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .tab-btn {
+            background: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+            font-size: 14px;
+        }
+        .tab-btn.active {
+            background: #007bff;
+        }
+        .output-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #2d2d2d;
+            border-radius: 0 5px 5px 5px;
+            border: 1px solid #444;
+        }
+        #codeOutput {
+            width: 100%;
+            height: 100%;
+            background: #1e1e1e;
+            color: #569cd6;
+            border: none;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+        }
+        #previewOutput {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #fff;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="panel left-panel">
+        <h2>🛠️ Builder Data</h2>
+        <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Masukkan data diri untuk generate portfolio.</p>
+
+        <div class="form-group">
+            <label for="inputName">Nama Lengkap</label>
+            <input type="text" id="inputName" placeholder="Contoh: Steven Erlinto" oninput="generateCode()">
+        </div>
+
+        <div class="form-group">
+            <label for="inputRole">Profesi / Keahlian</label>
+            <input type="text" id="inputRole" placeholder="Contoh: Cybersecurity Specialist" oninput="generateCode()">
+        </div>
+
+        <div class="form-group">
+            <label for="inputImage">URL Foto Profil</label>
+            <input type="url" id="inputImage" placeholder="https://link-gambar.com/foto.jpg" oninput="generateCode()">
+        </div>
+
+        <div class="form-group">
+            <label for="inputAbout">Tentang Saya</label>
+            <textarea id="inputAbout" placeholder="Tulis deskripsi singkat tentang diri kamu..." oninput="generateCode()"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="inputCerts">Sertifikat (Pisahkan dengan enter)</label>
+            <textarea id="inputCerts" placeholder="Google Cyber Security&#10;Fortinet Certified Associate&#10;Juara 2 CTF Nasional" oninput="generateCode()"></textarea>
+        </div>
+    </div>
+
+    <div class="panel right-panel">
+        <h2>✨ Hasil Generate</h2>
+        
+        <div class="tabs">
+            <button class="tab-btn active" id="btnCode" onclick="switchTab('code')">Source Code</button>
+            <button class="tab-btn" id="btnPreview" onclick="switchTab('preview')">Live Preview</button>
+        </div>
+
+        <div class="output-container">
+            <textarea id="codeOutput" readonly></textarea>
+            <iframe id="previewOutput"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Set default value saat halaman pertama kali diload
+        document.getElementById('inputName').value = "John Doe";
+        document.getElementById('inputRole').value = "Web Developer & Security Enthusiast";
+        document.getElementById('inputImage').value = "https://ui-avatars.com/api/?name=John+Doe&size=150&background=007bff&color=fff";
+        document.getElementById('inputAbout').value = "Saya adalah seorang penggemar teknologi yang fokus pada pengembangan web yang aman dan modern.";
+        document.getElementById('inputCerts').value = "Sertifikat Dasar Pemrograman Web\nSertifikat Keamanan Jaringan Dasar";
+
+        function generateCode() {
+            // 1. Ambil nilai dari form
+            const name = document.getElementById('inputName').value || "Nama Kamu";
+            const role = document.getElementById('inputRole').value || "Profesi Kamu";
+            const image = document.getElementById('inputImage').value || "https://ui-avatars.com/api/?name=No+Name&size=150";
+            const about = document.getElementById('inputAbout').value || "Deskripsi tentang kamu...";
+            const certsRaw = document.getElementById('inputCerts').value;
+
+            // 2. Olah list sertifikat menjadi tag <li>
+            let certsHTML = "";
+            if (certsRaw.trim() !== "") {
+                const certArray = certsRaw.split('\n');
+                certArray.forEach(cert => {
+                    if(cert.trim() !== "") {
+                        certsHTML += `\n                    <li>${cert}</li>`;
+                    }
+                });
+            } else {
+                certsHTML = "\n                    <li>Belum ada sertifikat ditambahkan</li>";
+            }
+
+            // 3. Susun Template HTML & CSS
+            const htmlTemplate = `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - ${name}</title>
+    <style>
+        /* CSS Reset & Dasar */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        /* Desain Card Portfolio */
+        .card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 40px;
+            border-top: 5px solid #007bff;
+        }
+
+        .profile-img {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #f4f7f6;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+
+        h1 { margin: 0; font-size: 26px; color: #222; }
+        h3 { margin: 5px 0 20px 0; font-size: 16px; color: #007bff; font-weight: 500; }
+        p { font-size: 15px; line-height: 1.6; color: #555; padding: 0 20px; }
+
+        /* Desain Bagian Sertifikat */
+        .cert-section {
+            margin-top: 30px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: left;
+        }
+
+        .cert-section h2 {
+            font-size: 18px;
+            margin-top: 0;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+            color: #333;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        ul li {
+            background: #fff;
+            margin-bottom: 8px;
+            padding: 10px 15px;
+            border-left: 4px solid #007bff;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <img src="${image}" alt="Foto Profil" class="profile-img">
+        <h1>${name}</h1>
+        <h3>${role}</h3>
+        <p>${about}</p>
+
+        <div class="cert-section">
+            <h2>🏆 Sertifikat & Pencapaian</h2>
+            <ul>${certsHTML}
+            </ul>
+        </div>
+    </div>
+
+</body>
+</html>`;
+
+            // 4. Masukkan hasil ke Textarea Code
+            document.getElementById('codeOutput').value = htmlTemplate;
+
+            // 5. Masukkan hasil ke Iframe Preview
+            document.getElementById('previewOutput').srcdoc = htmlTemplate;
+        }
+
+        // Fungsi untuk ganti tab antara Code dan Preview
+        function switchTab(tabName) {
+            const codeOutput = document.getElementById('codeOutput');
+            const previewOutput = document.getElementById('previewOutput');
+            const btnCode = document.getElementById('btnCode');
+            const btnPreview = document.getElementById('btnPreview');
+
+            if(tabName === 'code') {
+                codeOutput.style.display = 'block';
+                previewOutput.style.display = 'none';
+                btnCode.classList.add('active');
+                btnPreview.classList.remove('active');
+            } else {
+                codeOutput.style.display = 'none';
+                previewOutput.style.display = 'block';
+                btnCode.classList.remove('active');
+                btnPreview.classList.add('active');
+            }
+        }
+
+        // Jalankan fungsi pertama kali
+        generateCode();
+    </script>
+</body>
+</html>
