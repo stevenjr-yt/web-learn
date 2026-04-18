@@ -57,6 +57,18 @@
         .splash-word:nth-child(3) { animation-delay: 0.9s; }
         .splash-word:nth-child(4) { animation-delay: 1.2s; font-weight: 600; color: #007bff; } /* Penekanan pada kata terakhir */
 
+        /* Tambahan teks Gemini API */
+        .splash-subtitle {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #888;
+            letter-spacing: 2px;
+            font-weight: 400;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: modernFadeSlide 1s ease-out 1.8s forwards; /* Muncul setelah teks utama */
+        }
+
         @keyframes modernFadeSlide {
             0% { transform: translateY(20px); opacity: 0; }
             100% { transform: translateY(0); opacity: 1; }
@@ -163,6 +175,7 @@
             <span class="splash-word">Security</span>
             <span class="splash-word">Club</span>
         </div>
+        <div class="splash-subtitle">Integrated by Gemini API</div>
     </div>
 
     <div class="panel left-panel">
@@ -212,13 +225,13 @@
     <script>
         // --- LOGIKA SPLASH SCREEN ---
         window.addEventListener('load', function() {
-            // Memberikan waktu sedikit ekstra agar animasi kata terakhir selesai
+            // Memberikan waktu ekstra agar animasi subtitle juga selesai
             setTimeout(function() {
                 const splash = document.getElementById('splash-screen');
                 splash.style.opacity = '0';
                 splash.style.visibility = 'hidden';
                 document.body.style.overflow = 'auto'; // Kembalikan scroll setelah animasi
-            }, 3000); // Durasi total tampil animasi (3 detik)
+            }, 3500); // Durasi total tampil animasi dinaikkan jadi 3.5 detik
         });
 
         // Set default value saat halaman pertama kali diload
@@ -249,7 +262,7 @@
                 certsHTML = "\n                    <li>Belum ada sertifikat ditambahkan</li>";
             }
 
-            // 3. Susun Template HTML, CSS, dan JS (Sama seperti sebelumnya)
+            // 3. Susun Template HTML, CSS, dan JS
             const htmlTemplate = `<!DOCTYPE html>
 <html lang="id">
 <head>
